@@ -1,0 +1,1708 @@
+commit da10aeca2c20546194a11a8be6775f84b229404e
+Author: ossyahya60 <ossyahya60@gmail.com>
+Date:   Sat May 8 19:24:17 2021 +0200
+
+    Three Tests for Flicker
+
+diff --git a/Locators.py b/Locators.py
+new file mode 100644
+index 0000000..9721fe6
+--- /dev/null
++++ b/Locators.py
+@@ -0,0 +1,15 @@
++class Locators:
++    Email = "login-email"
++    NextButton = '//*[@id="login-form"]/button'
++    Password = "login-password"
++    SignIN = '//*[@id="login-form"]/button'
++    FavouriteButton = '/html/body/div[1]/div/div[2]/div/div[5]/div[1]/div/a'
++    FavesCount = "fave-count-label"
++    CommentField = '/html/body/div[1]/div/div[3]/div/div/div[1]/div[4]/div/div/div[2]/textarea[1]'
++    CommentButton = '/html/body/div[1]/div/div[3]/div/div/div[1]/div[4]/div/button'
++    CommentsCount = "comment-count-label"
++    Comments = "/html/body/div[1]/div/div[3]/div/div/div[1]/div[4]/div/ul/li"
++    EditDescriptionArea = '/html/body/div[1]/div/div[3]/div/div/div[1]/div[2]/div'
++    EditDescriptionTextField = '/html/body/div[1]/div/div[3]/div/div/div[1]/div[2]/div/textarea[1]'
++    DoneButton = '/html/body/div[1]/div/div[3]/div/div/div[1]/div[2]/div/button'
++    DescriptionField = '/html/body/div[1]/div/div[3]/div/div/div[1]/div[2]/div/h2'
+\ No newline at end of file
+diff --git a/__pycache__/Locators.cpython-38.pyc b/__pycache__/Locators.cpython-38.pyc
+new file mode 100644
+index 0000000..de74ee6
+Binary files /dev/null and b/__pycache__/Locators.cpython-38.pyc differ
+diff --git a/__pycache__/test_Comment.cpython-38-pytest-6.2.3.pyc b/__pycache__/test_Comment.cpython-38-pytest-6.2.3.pyc
+new file mode 100644
+index 0000000..b208856
+Binary files /dev/null and b/__pycache__/test_Comment.cpython-38-pytest-6.2.3.pyc differ
+diff --git a/__pycache__/test_EditDescription.cpython-38-pytest-6.2.3.pyc b/__pycache__/test_EditDescription.cpython-38-pytest-6.2.3.pyc
+new file mode 100644
+index 0000000..20e85d2
+Binary files /dev/null and b/__pycache__/test_EditDescription.cpython-38-pytest-6.2.3.pyc differ
+diff --git a/__pycache__/test_Favourite.cpython-38-pytest-6.2.3.pyc b/__pycache__/test_Favourite.cpython-38-pytest-6.2.3.pyc
+new file mode 100644
+index 0000000..cfb2f51
+Binary files /dev/null and b/__pycache__/test_Favourite.cpython-38-pytest-6.2.3.pyc differ
+diff --git a/__pycache__/test_Login_Then_Follow.cpython-38-pytest-6.2.3.pyc b/__pycache__/test_Login_Then_Follow.cpython-38-pytest-6.2.3.pyc
+new file mode 100644
+index 0000000..48d1872
+Binary files /dev/null and b/__pycache__/test_Login_Then_Follow.cpython-38-pytest-6.2.3.pyc differ
+diff --git a/msedgedriver.exe b/msedgedriver.exe
+new file mode 100644
+index 0000000..5aa5203
+Binary files /dev/null and b/msedgedriver.exe differ
+diff --git a/test_Comment.py b/test_Comment.py
+new file mode 100644
+index 0000000..ad82c2e
+--- /dev/null
++++ b/test_Comment.py
+@@ -0,0 +1,81 @@
++from selenium import webdriver
++from selenium.webdriver.common.keys import Keys
++from msedge.selenium_tools import Edge, EdgeOptions
++import time
++from Locators import Locators
++
++# Change this according to your chosen browser
++options = EdgeOptions()
++options.use_chromium = True
++
++driver = Edge(options = options)
++driver.implicitly_wait(10) # seconds
++driver.get("https://identity.flickr.com/")
++
++LocatorS = Locators()
++
++#Variables TODO Fill these
++email = "ossyahya60@gmail.com"
++password = "32233750Yhaya"
++Username = "Osama Yahya"
++CommentText = "Nice Photo!"
++CommentFormatFlicker1 = Username + "\n" + "1s" + "\n" + CommentText
++CommentFormatFlicker2 = Username + " " + "1s" + "\n" + CommentText
++
++#Locators
++Email = driver.find_element_by_id(LocatorS.Email)
++NextButton = driver.find_element_by_xpath(LocatorS.NextButton)
++
++#Actions
++Email.send_keys(email)
++NextButton.click()
++
++#Locators
++Password = driver.find_element_by_id(LocatorS.Password)
++SignIN = driver.find_element_by_xpath(LocatorS.SignIN)
++
++#Actions
++Password.send_keys(password)
++SignIN.click()
++time.sleep(10)
++driver.get("https://www.flickr.com/photos/37607627@N05/51133618573/in/explore")
++time.sleep(10)
++
++#Locators
++CommentField = driver.find_element_by_xpath(LocatorS.CommentField)
++
++#Actions
++CommentField.send_keys(CommentText)
++
++#Locators
++CommentButton = driver.find_element_by_xpath(LocatorS.CommentButton)
++
++#Locators
++CommentsCount = driver.find_element_by_class_name(LocatorS.CommentsCount)
++PrevCount = int(CommentsCount.text)
++
++#Actions
++CommentButton.click()
++
++time.sleep(5)
++
++#Locators
++Comments = driver.find_elements_by_xpath(LocatorS.Comments)
++CommentsText = [commentText.text for commentText in Comments]
++
++CommentedSuccessfully = False
++for OneComment in CommentsText:
++    if OneComment == CommentFormatFlicker1 or OneComment == CommentFormatFlicker2:
++        CommentedSuccessfully = True
++        break
++
++assert CommentedSuccessfully == True
++
++CommentsCount = driver.find_element_by_class_name(LocatorS.CommentsCount)
++CurrentCount = int(CommentsCount.text)
++
++assert CurrentCount > PrevCount
++
++time.sleep(5)
++
++driver.quit()
+\ No newline at end of file
+diff --git a/test_EditDescription.py b/test_EditDescription.py
+new file mode 100644
+index 0000000..25b5ca8
+--- /dev/null
++++ b/test_EditDescription.py
+@@ -0,0 +1,73 @@
++from selenium import webdriver
++from selenium.webdriver.common.keys import Keys
++from msedge.selenium_tools import Edge, EdgeOptions
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.common.by import By
++import time
++from Locators import Locators
++
++# Change this according to your chosen browser
++options = EdgeOptions()
++options.use_chromium = True
++
++driver = Edge(options = options)
++driver.implicitly_wait(10) # seconds
++driver.get("https://identity.flickr.com/")
++
++#Variables
++email = "ossyahya60@gmail.com"
++password = "32233750Yhaya"
++NewDescription = "Very Noice"
++
++LocatorS = Locators()
++
++#Locators
++Email = driver.find_element_by_id(LocatorS.Email)
++NextButton = driver.find_element_by_xpath(LocatorS.NextButton)
++
++#Actions
++Email.send_keys(email)
++NextButton.click()
++
++#Locators
++Password = driver.find_element_by_id(LocatorS.Password)
++SignIN = driver.find_element_by_xpath(LocatorS.SignIN)
++
++#Actions
++Password.send_keys(password)
++SignIN.click()
++time.sleep(6)
++driver.get("https://www.flickr.com/photos/192752737@N07/51159264190/in/dateposted/")
++time.sleep(10)
++
++#CookieClose = driver.find_element_by_xpath('/html/body/div[1]/div/div[4]/div/div/div/div/div/div[2]/a').click()
++
++#Locators
++EditDescriptionArea = driver.find_element_by_xpath(LocatorS.EditDescriptionArea)
++
++#Actions
++EditDescriptionArea.send_keys(Keys.ENTER)
++
++#Locators
++EditDescriptionTextField = driver.find_element_by_xpath(LocatorS.EditDescriptionTextField)
++
++#Actions
++EditDescriptionTextField.clear()
++EditDescriptionTextField.send_keys(NewDescription)
++
++#Locator and Action
++WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, LocatorS.DoneButton))).click()
++
++driver.refresh()
++
++time.sleep(5)
++
++DescriptionField = driver.find_element_by_xpath(LocatorS.DescriptionField)
++Description = DescriptionField.text
++
++assert Description == NewDescription
++
++time.sleep(5)
++
++driver.quit()
+\ No newline at end of file
+diff --git a/test_Favourite.py b/test_Favourite.py
+new file mode 100644
+index 0000000..bf1d869
+--- /dev/null
++++ b/test_Favourite.py
+@@ -0,0 +1,60 @@
++from selenium import webdriver
++from selenium.webdriver.common.keys import Keys
++from msedge.selenium_tools import Edge, EdgeOptions
++import time
++from Locators import Locators
++
++# Change this according to your chosen browser
++options = EdgeOptions()
++options.use_chromium = True
++
++driver = Edge(options = options)
++driver.implicitly_wait(10) # seconds
++driver.get("https://identity.flickr.com/")
++
++LocatorS = Locators()
++
++#Variables
++email = "ossyahya60@gmail.com"
++password = "32233750Yhaya"
++
++#Locators
++Email = driver.find_element_by_id(LocatorS.Email)
++NextButton = driver.find_element_by_xpath(LocatorS.NextButton)
++
++#Actions
++Email.send_keys(email)
++NextButton.click()
++
++#Locators
++Password = driver.find_element_by_id(LocatorS.Password)
++SignIN = driver.find_element_by_xpath(LocatorS.SignIN)
++
++#Actions
++Password.send_keys(password)
++SignIN.click()
++time.sleep(5)
++driver.get("https://www.flickr.com/photos/116685283@N05/51140140914/in/dateposted/")
++time.sleep(10)
++
++#Locators
++FavouriteButton = driver.find_element_by_xpath(LocatorS.FavouriteButton)
++
++#Locators
++FavesCountPrev = int(driver.find_element_by_class_name(LocatorS.FavesCount).text)
++
++#Actions
++FavouriteButton.click()
++
++time.sleep(5)
++
++#Locators
++FavesCountCurrent = int(driver.find_element_by_class_name(LocatorS.FavesCount).text)
++
++#Check If Button is really pressed
++assert FavesCountCurrent > FavesCountPrev
++assert FavouriteButton.get_attribute("class") == "fave-star animated is-faved"
++
++time.sleep(5)
++
++driver.quit()
+\ No newline at end of file
+
+commit 61f3abdea6058a589e7a2874c83cbcf751b4582a
+Author: maria ossama <mariamaximus1012@gmail.com>
+Date:   Sat May 8 19:10:55 2021 +0200
+
+    first commit
+
+diff --git a/changeDisplayName.py b/changeDisplayName.py
+new file mode 100644
+index 0000000..f6bdc2a
+--- /dev/null
++++ b/changeDisplayName.py
+@@ -0,0 +1,92 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "maria.ossama10@yahoo.com";
++myPassword = "000011112222m";
++
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++
++#go to my settings
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++settingsButton=driver.find_element_by_xpath(Locators.settingsButtonXpath);
++settingsButton.click();
++
++
++###### Change Display Name #######
++changeDisplayName=driver.find_element_by_xpath(Locators.changeDisplayNameXpath);
++changeDisplayName.click();
++time.sleep(1);
++dispURL="https://www.flickr.com/account/prefs/screenname/?from=personal";
++checkURL=driver.current_url;
++assert checkURL==dispURL , "failed to direct to change display name"
++displayName=driver.find_element_by_xpath(Locators.displayNameXpath).clear();
++displayName=driver.find_element_by_xpath(Locators.displayNameXpath);
++newDisplayName="Myriam10";
++displayName.send_keys(newDisplayName);
++
++saveDisplayName=driver.find_element_by_xpath(Locators.saveDisplayNameXpath);
++saveDisplayName.click();
++time.sleep(2);
++try:
++    mess=driver.find_element_by_xpath(Locators.errorMessageDisplayXpath).text;
++    print(mess);
++
++except NoSuchElementException:
++    print("Acceptable Display name");
++
++###check###
++checkURL2="https://www.flickr.com/account?donename=1";
++currURL=driver.current_url;
++assert checkURL2==currURL, "Failed to change Display Name";
++
++#go to my profile
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++prof=ProfileNameButton.text;
++print(prof);
++ProfileNameButton.click();
++
++time.sleep(2);
++message = driver.find_element_by_xpath(Locators.handleNameXpath);
++for i in message:
++    print(i.text)
++    if i.text==newDisplayName:
++        print("Display Name is changed");
++
++
++
++
++
++
+diff --git a/changeDisplayName2.py b/changeDisplayName2.py
+new file mode 100644
+index 0000000..f8b03e0
+--- /dev/null
++++ b/changeDisplayName2.py
+@@ -0,0 +1,92 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "maria.ossama10@yahoo.com";
++myPassword = "000011112222m";
++
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++
++#go to my settings
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++settingsButton=driver.find_element_by_xpath(Locators.settingsButtonXpath);
++settingsButton.click();
++
++
++###### Change Display Name #######
++changeDisplayName=driver.find_element_by_xpath(Locators.changeDisplayNameXpath);
++changeDisplayName.click();
++time.sleep(1);
++dispURL="https://www.flickr.com/account/prefs/screenname/?from=personal";
++checkURL=driver.current_url;
++assert checkURL==dispURL , "failed to direct to change display name"
++displayName=driver.find_element_by_xpath(Locators.displayNameXpath).clear();
++displayName=driver.find_element_by_xpath(Locators.displayNameXpath);
++newDisplayName="";
++displayName.send_keys(newDisplayName);
++
++saveDisplayName=driver.find_element_by_xpath(Locators.saveDisplayNameXpath);
++saveDisplayName.click();
++time.sleep(2);
++try:
++    mess=driver.find_element_by_xpath(Locators.errorMessageDisplayXpath).text;
++    print(mess);
++
++except NoSuchElementException:
++    print("Acceptable Display name");
++
++###check###
++checkURL2="https://www.flickr.com/account?donename=1";
++currURL=driver.current_url;
++assert checkURL2==currURL, "Failed to change Display Name";
++
++#go to my profile
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++prof=ProfileNameButton.text;
++print(prof);
++ProfileNameButton.click();
++
++time.sleep(2);
++message = driver.find_element_by_xpath(Locators.handleNameXpath);
++for i in message:
++    print(i.text)
++    if i.text==newDisplayName:
++        print("Display Name is changed");
++
++
++
++
++
++
+diff --git a/changeDisplayName3.py b/changeDisplayName3.py
+new file mode 100644
+index 0000000..c4c4d7d
+--- /dev/null
++++ b/changeDisplayName3.py
+@@ -0,0 +1,93 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "maria.ossama10@yahoo.com";
++myPassword = "000011112222m";
++
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++
++#go to my settings
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++settingsButton=driver.find_element_by_xpath(Locators.settingsButtonXpath);
++settingsButton.click();
++
++
++###### Change Display Name #######
++changeDisplayName=driver.find_element_by_xpath(Locators.changeDisplayNameXpath);
++changeDisplayName.click();
++time.sleep(1);
++dispURL="https://www.flickr.com/account/prefs/screenname/?from=personal";
++checkURL=driver.current_url;
++assert checkURL==dispURL , "failed to direct to change display name"
++displayName=driver.find_element_by_xpath(Locators.displayNameXpath).clear();
++displayName=driver.find_element_by_xpath(Locators.displayNameXpath);
++newDisplayName="10121998";
++displayName.send_keys(newDisplayName);
++
++saveDisplayName=driver.find_element_by_xpath(Locators.saveDisplayNameXpath);
++saveDisplayName.click();
++time.sleep(2);
++try:
++    mess=driver.find_element_by_xpath(Locators.errorMessageDisplayXpath).text;
++    print(mess);
++
++except NoSuchElementException:
++    print("Acceptable Display name");
++
++###check###
++checkURL2="https://www.flickr.com/account?donename=1";
++currURL=driver.current_url;
++assert checkURL2==currURL, "Failed to change Display Name";
++
++time.sleep(3);
++#go to my profile
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++prof=ProfileNameButton.text;
++print(prof);
++ProfileNameButton.click();
++
++# time.sleep(2);
++# message = driver.find_element_by_xpath(Locators.handleNameXpath);
++# for i in message:
++#     print(i.text)
++#     if i.text==newDisplayName:
++#         print("Display Name is changed");
++
++
++
++
++
++
+diff --git a/changeName.py b/changeName.py
+new file mode 100644
+index 0000000..992981e
+--- /dev/null
++++ b/changeName.py
+@@ -0,0 +1,93 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "maria.ossama10@yahoo.com";
++myPassword = "000011112222m";
++
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++
++#go to my settings
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++settingsButton=driver.find_element_by_xpath(Locators.settingsButtonXpath);
++settingsButton.click();
++
++
++#change Real name
++changeRealName=driver.find_element_by_xpath(Locators.changeRealNameXpath);
++changeRealName.click();
++firstNameInput=driver.find_element_by_xpath(Locators.firstNameInputXpath).clear();
++firstNameInput=driver.find_element_by_xpath(Locators.firstNameInputXpath);
++first=""
++last="10"
++lastNameInput=driver.find_element_by_xpath(Locators.lastNameInputXpath).clear()
++lastNameInput=driver.find_element_by_xpath(Locators.lastNameInputXpath);
++
++firstNameInput.send_keys(first);
++time.sleep(1)
++lastNameInput.send_keys(last)
++time.sleep(2);
++
++scroll=driver.execute_script("window.scrollTo(0, 1000)");
++saveRealName=driver.find_element_by_xpath(Locators.saveRealNameXpath);
++saveRealName.click();
++time.sleep(2);
++checkURL="https://www.flickr.com/account/?tab=default&doneprofile=1"
++currURL=driver.current_url;
++assert checkURL==currURL,"failed to change Real Name";
++
++#go to my profile
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++handleName=ProfileNameButton.text;
++#print(handleName);
++ProfileNameButton.click();
++
++profile=first+last;
++
++time.sleep(2);
++message = driver.find_elements_by_tag_name('h1')
++for i in message:
++    #print(i.text)
++    if i.text==profile:
++        print(i.text);
++        print("Real Name is Changed")
++    elif i.text==handleName:
++        print(i.text);
++        print("Real Name is Changed")
++
++
++
++
++
+diff --git a/changeName2.py b/changeName2.py
+new file mode 100644
+index 0000000..c45e019
+--- /dev/null
++++ b/changeName2.py
+@@ -0,0 +1,93 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "maria.ossama10@yahoo.com";
++myPassword = "000011112222m";
++
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++
++#go to my settings
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++settingsButton=driver.find_element_by_xpath(Locators.settingsButtonXpath);
++settingsButton.click();
++
++
++#change Real name
++changeRealName=driver.find_element_by_xpath(Locators.changeRealNameXpath);
++changeRealName.click();
++firstNameInput=driver.find_element_by_xpath(Locators.firstNameInputXpath).clear();
++firstNameInput=driver.find_element_by_xpath(Locators.firstNameInputXpath);
++first=""
++last=""
++lastNameInput=driver.find_element_by_xpath(Locators.lastNameInputXpath).clear()
++lastNameInput=driver.find_element_by_xpath(Locators.lastNameInputXpath);
++
++firstNameInput.send_keys(first);
++time.sleep(1)
++lastNameInput.send_keys(last)
++time.sleep(2);
++
++scroll=driver.execute_script("window.scrollTo(0, 1000)");
++saveRealName=driver.find_element_by_xpath(Locators.saveRealNameXpath);
++saveRealName.click();
++time.sleep(2);
++checkURL="https://www.flickr.com/account/?tab=default&doneprofile=1"
++currURL=driver.current_url;
++assert checkURL==currURL,"failed to change Real Name";
++
++#go to my profile
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++handleName=ProfileNameButton.text;
++#print(handleName);
++ProfileNameButton.click();
++
++profile=first+last;
++
++time.sleep(2);
++message = driver.find_elements_by_tag_name('h1')
++for i in message:
++    #print(i.text)
++    if i.text==profile:
++        print(i.text);
++        print("Real Name is Changed")
++    elif i.text==handleName:
++        print(i.text);
++        print("Real Name is Changed")
++
++
++
++
++
+diff --git a/changePassword.py b/changePassword.py
+new file mode 100644
+index 0000000..7ee91de
+--- /dev/null
++++ b/changePassword.py
+@@ -0,0 +1,74 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "maria.ossama10@yahoo.com";
++myPassword = "000011112222m";
++
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++
++#go to my settings
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++settingsButton=driver.find_element_by_xpath(Locators.settingsButtonXpath);
++settingsButton.click();
++
++editPassword=driver.find_element_by_xpath(Locators.editPasswordXpath);
++editPassword.click();
++
++
++## CORRECT PASSWORD
++currentPass="000011112222m";
++## ACCEPTABLE NEW PASSWORD
++newPass="1234567891011m";
++
++
++currentPasswordInput=driver.find_element_by_xpath(Locators.currentPasswordInputXpath);
++currentPasswordInput.send_keys(currentPass);
++newPasswordInput=driver.find_element_by_xpath(Locators.newPasswordInputXpath);
++newPasswordInput.send_keys(newPass);
++changePasswordButton=driver.find_element_by_xpath(Locators.changePasswordButtonXpath);
++changePasswordButton.click();
++time.sleep(2);
++currURL= driver.current_url;
++print(currURL);
++completeURL="https://identity.flickr.com/change-complete/change-password";
++assert currURL==completeURL , "NO Change"
++
++gotItButton=driver.find_element_by_xpath(Locators.gotItButtonXpath);
++gotItButton.click();
++
++time.sleep(2);
++currURL=driver.current_url;
++print(currURL);
++accURL="https://www.flickr.com/account";
++
++assert currURL==accURL,"failed to redirect to account";
+\ No newline at end of file
+diff --git a/changePassword2.py b/changePassword2.py
+new file mode 100644
+index 0000000..8b327c6
+--- /dev/null
++++ b/changePassword2.py
+@@ -0,0 +1,74 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "maria.ossama10@yahoo.com";
++myPassword = "000011112222m";
++
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++
++#go to my settings
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++settingsButton=driver.find_element_by_xpath(Locators.settingsButtonXpath);
++settingsButton.click();
++
++editPassword=driver.find_element_by_xpath(Locators.editPasswordXpath);
++editPassword.click();
++
++
++##  WRONG PASSWORD
++currentPass="000011112222";
++## ACCEPTABLE NEW PASSWORD
++newPass="1234567891011m";
++
++
++currentPasswordInput=driver.find_element_by_xpath(Locators.currentPasswordInputXpath);
++currentPasswordInput.send_keys(currentPass);
++newPasswordInput=driver.find_element_by_xpath(Locators.newPasswordInputXpath);
++newPasswordInput.send_keys(newPass);
++changePasswordButton=driver.find_element_by_xpath(Locators.changePasswordButtonXpath);
++changePasswordButton.click();
++time.sleep(2);
++currURL= driver.current_url;
++print(currURL);
++completeURL="https://identity.flickr.com/change-complete/change-password";
++assert currURL==completeURL , "NO Change"
++
++gotItButton=driver.find_element_by_xpath(Locators.gotItButtonXpath);
++gotItButton.click();
++
++time.sleep(2);
++currURL=driver.current_url;
++print(currURL);
++accURL="https://www.flickr.com/account";
++
++assert currURL==accURL,"failed to redirect to account";
+\ No newline at end of file
+diff --git a/changePassword3.py b/changePassword3.py
+new file mode 100644
+index 0000000..0c07372
+--- /dev/null
++++ b/changePassword3.py
+@@ -0,0 +1,78 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "maria.ossama10@yahoo.com";
++myPassword = "000011112222m";
++
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++
++#go to my settings
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++settingsButton=driver.find_element_by_xpath(Locators.settingsButtonXpath);
++settingsButton.click();
++
++editPassword=driver.find_element_by_xpath(Locators.editPasswordXpath);
++editPassword.click();
++
++
++## CORRECT PASSWORD
++currentPass="000011112222m";
++## UNACCEPTABLE NEW PASSWORD
++##Less than 12 char
++newPass="123456789";
++
++
++currentPasswordInput=driver.find_element_by_xpath(Locators.currentPasswordInputXpath);
++currentPasswordInput.send_keys(currentPass);
++newPasswordInput=driver.find_element_by_xpath(Locators.newPasswordInputXpath);
++newPasswordInput.send_keys(newPass);
++
++
++
++changePasswordButton=driver.find_element_by_xpath(Locators.changePasswordButtonXpath);
++changePasswordButton.click();
++time.sleep(2);
++currURL= driver.current_url;
++print(currURL);
++completeURL="https://identity.flickr.com/change-complete/change-password";
++assert currURL==completeURL , "NO Change"
++
++gotItButton=driver.find_element_by_xpath(Locators.gotItButtonXpath);
++gotItButton.click();
++
++time.sleep(2);
++currURL=driver.current_url;
++print(currURL);
++accURL="https://www.flickr.com/account";
++
++assert currURL==accURL,"failed to redirect to account";
+\ No newline at end of file
+diff --git a/changePassword4.py b/changePassword4.py
+new file mode 100644
+index 0000000..b17b75f
+--- /dev/null
++++ b/changePassword4.py
+@@ -0,0 +1,75 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "maria.ossama10@yahoo.com";
++myPassword = "000011112222m";
++
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++
++#go to my settings
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++settingsButton=driver.find_element_by_xpath(Locators.settingsButtonXpath);
++settingsButton.click();
++
++editPassword=driver.find_element_by_xpath(Locators.editPasswordXpath);
++editPassword.click();
++
++
++## CORRECT PASSWORD
++currentPass="000011112222m";
++## UNACCEPTABLE NEW PASSWORD
++##spaces
++newPass="  1234567891011";
++
++
++currentPasswordInput=driver.find_element_by_xpath(Locators.currentPasswordInputXpath);
++currentPasswordInput.send_keys(currentPass);
++newPasswordInput=driver.find_element_by_xpath(Locators.newPasswordInputXpath);
++newPasswordInput.send_keys(newPass);
++changePasswordButton=driver.find_element_by_xpath(Locators.changePasswordButtonXpath);
++changePasswordButton.click();
++time.sleep(2);
++currURL= driver.current_url;
++print(currURL);
++completeURL="https://identity.flickr.com/change-complete/change-password";
++assert currURL==completeURL , "NO Change"
++
++gotItButton=driver.find_element_by_xpath(Locators.gotItButtonXpath);
++gotItButton.click();
++
++time.sleep(2);
++currURL=driver.current_url;
++print(currURL);
++accURL="https://www.flickr.com/account";
++
++assert currURL==accURL,"failed to redirect to account";
+\ No newline at end of file
+diff --git a/delete.py b/delete.py
+new file mode 100644
+index 0000000..bd9a912
+--- /dev/null
++++ b/delete.py
+@@ -0,0 +1,122 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++# import ait
++# import autoit
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "mariamaximus1012@gmail.com";
++myPassword = "1234567891011m";
++# myEmail = "passantahmedmaher@gmail.com";
++# myPassword = "1234567891011!!";
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++#go to my profile
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++ProfileNameButton.click();
++
++photostream=driver.find_element_by_xpath(Locators.photostreamXpath);
++photostream.click();
++
++time.sleep(2)
++
++photosCount=driver.find_element_by_xpath(Locators.photosCountXpath).text;
++b=photosCount.__contains__("Photos");
++if b== True:
++    p=photosCount.removesuffix(' Photos');
++else:
++    p = photosCount.removesuffix(' Photo');
++
++count=int(p, base=10);
++print(count);
++
++
++picName="dog2";
++
++pic_name = driver.find_element_by_xpath(Locators.firstPicXpath).get_attribute("aria-label")
++assert (pic_name).__contains__(picName), "Invalid pic"
++print(pic_name);
++
++pic=driver.find_element_by_xpath(Locators.firstPicXpath);
++pic.click();
++
++time.sleep(2)
++editButton=driver.find_element_by_xpath(Locators.editButtonXpath);
++editButton.click();
++time.sleep(2)
++deleteButton=driver.find_element_by_xpath(Locators.deleteButtonXpath);
++# deleteButton.click();
++driver.execute_script("arguments[0].click();", deleteButton)
++time.sleep(2)
++deletePopUp=driver.find_element_by_xpath(Locators.deletePopUpXpath);
++deletePopUp.click();
++
++time.sleep(5)
++#go to my profile
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++ProfileNameButton.click();
++
++photostream=driver.find_element_by_xpath(Locators.photostreamXpath);
++photostream.click();
++
++##assertion on the picture itself
++p = driver.find_element_by_xpath(Locators.firstPicXpath).get_attribute("aria-label");
++print(p)
++print(picName);
++
++# assert (p).__contains__(picName), "Deleted"
++
++if (p).__contains__(picName):
++    print("successfully deleted")
++else:
++    print("deletion failed")
++
++
++##assertion on the count of picture
++cameraroll=driver.find_element_by_xpath(Locators.camerarollXpath);
++cameraroll.click();
++time.sleep(2);
++
++photosCount=driver.find_element_by_xpath(Locators.photosCountXpath).text;
++bAfter=photosCount.__contains__("Photos");
++if bAfter== True:
++    pAfter=photosCount.removesuffix(' Photos');
++else:
++    pAfter = photosCount.removesuffix(' Photo');
++pAfter=photosCount.removesuffix(' Photos');
++countAfter=int(pAfter, base=10);
++print(countAfter);
++count=count-1;
++print(countAfter);
++print(count);
++assert countAfter==count, "wrong count"
++
+diff --git a/followcheck.py b/followcheck.py
+new file mode 100644
+index 0000000..8fe0430
+--- /dev/null
++++ b/followcheck.py
+@@ -0,0 +1,78 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "mariamaximus1012@gmail.com";
++myPassword = "1234567891011m";
++# myEmail = "passantahmedmaher@gmail.com";
++# myPassword = "1234567891011!!";
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++searchInput=driver.find_element_by_xpath(Locators.searchInputXpath);
++profile="myriammaximus"
++searchInput.send_keys(profile);
++time.sleep(2)
++searchPeople=driver.find_element_by_xpath(Locators.searchPeopleXpath);
++driver.execute_script("arguments[0].click();", searchPeople)
++followButton = driver.find_element_by_xpath(Locators.followButtonXpath)
++driver.execute_script("arguments[0].click();", followButton)
++time.sleep(3)
++#press follow button
++followButton = driver.find_element_by_xpath(Locators.followButtonXpath)
++print(followButton.text)
++# assert followButton.text == 'Following';
++time.sleep(2);
++#go to my profile
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(3);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++ProfileNameButton.click();
++
++
++followersButton=driver.find_element_by_xpath(Locators.followingButtonXpath);
++followersButton.click();
++
++
++searchFollowingInput=driver.find_element_by_xpath(Locators.searchFollowingInputXpath);
++searchFollowingInput.send_keys(profile)
++try:
++    searchProfile = driver.find_element_by_xpath(Locators.searchProfileXpath);
++    print("found")
++    profileName=searchProfile.text;
++    time.sleep(3);
++    # print(profileName)
++    # print(profile)
++    assert profile == profileName, "Failed to follow this user"
++
++
++except NoSuchElementException:
++    print("not found")
++
++
+diff --git a/listfollowed.py b/listfollowed.py
+new file mode 100644
+index 0000000..fe00941
+--- /dev/null
++++ b/listfollowed.py
+@@ -0,0 +1,67 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "mariamaximus1012@gmail.com";
++myPassword = "1234567891011m";
++# myEmail = "passantahmedmaher@gmail.com";
++# myPassword = "1234567891011!!";
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++#go to my profile
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++ProfileNameButton.click();
++
++
++#followers button
++followersButton=driver.find_element_by_xpath(Locators.followersButtonXpath);
++followersButton.click();
++
++#go to the first follower profile
++firstFollower=driver.find_element_by_xpath(Locators.firstFollowerXpath);
++firstFollower.click();
++
++followersButton=driver.find_element_by_xpath(Locators.followingButtonXpath);
++followersButton.click();
++
++profile="mariamaximus"
++
++message = driver.find_elements_by_tag_name('h2')
++for i in message:
++    print(i.text)
++    if i.text==profile:
++        print("correct")
++
++
++
++
++
+diff --git a/locators.py b/locators.py
+new file mode 100644
+index 0000000..ee18aa1
+--- /dev/null
++++ b/locators.py
+@@ -0,0 +1,69 @@
++class Locators():
++    # Welcome Page Locators
++
++    logInButtonXpath = "/html/body/div[1]/div/div[1]/div/div[3]/div/ul[2]/li[2]/a"
++
++    # Login Page Locators
++
++    myEmail = "mariamaximus1012@gmail.com"
++    myPassword = "1234567891011m";
++    emailAddressFieldId = "login-email";
++    passwordFieldId = "login-password";
++    nextButtonXpath = "/html/body/div/div/div[2]/div/div[2]/form/button";
++    signInButtonXpath = "/html/body/div/div/div[2]/div/div[2]/form/button";
++    chooseAnAccountXpath = "/html/body/div/div/div[2]/div/div[1]/h6"
++    # Home Page
++
++    profileIconXpath = "/html/body/div[1]/div/div[1]/div/div[3]/div/ul[2]/li[4]/div/div/div/a/div"
++    userNameXpath = "/html/body/div[4]/div/div[2]/div/div/div/section[1]/h4/a"
++    userName = "mariamaximus1012"
++    logOutXpath = "/html/body/div[4]/div/div[2]/div/div/div/section[3]/ul/li[4]/a"
++    exploreFieldXpath="/html/body/div[1]/div/div[1]/div/div[3]/div/ul[1]/li[2]/a"
++    pictureFieldXpath="/html/body/div[1]/div/div[3]/div[2]/div[1]/div/div/a"
++    #followButtonXpath="/html/body/div[1]/div/div[3]/div/div/div[1]/div[1]/div[2]/div/span/button"    follow.py
++    followButtonXpath="/html/body/div[1]/div/div[3]/div/div[2]/div/div/div[2]/div/button"     #followcheck.py
++    unfollowButtonXpath="/html/body/div[6]/div/div[2]/div/div/ul/li[4]/button"
++    profileButtonXpath="/html/body/div[1]/div/div[1]/div/div[3]/div/ul[2]/li[4]/div/div/div/a/div"
++    profileNameButtonXpath="/html/body/div[5]/div/div[2]/div/div/div/section[1]/h4/a"
++    followingButtonXpath="/html/body/div[1]/div/div[2]/div/div[4]/div[3]/div[2]/p[2]/a[2]"
++    followersButtonXpath="/html/body/div[1]/div/div[2]/div/div[4]/div[3]/div[2]/p[2]/a[1]"
++    searchInputXpath="/html/body/div[1]/div/div[1]/div/div[3]/div/ul[2]/li[1]/div/form/input"
++    searchPeopleXpath="/html/body/div[1]/div/div[1]/div/div[3]/div/ul[2]/li[1]/div/div/ul/li[2]/div"
++    searchFollowingInputXpath="/html/body/div[2]/div/form[2]/div/input[3]"
++    searchProfileXpath="/html/body/div[2]/div/form[2]/div/div[2]/div[1]/div[2]/ul/li[1]/p/span[1]/strong/a/span"
++    myProfileXpath="/html/body/div[1]/div/div[1]/div/div[3]/div/ul[1]/li[1]/a"
++    firstFollowerXpath="/html/body/div[2]/table[2]/tbody/tr[2]/td[2]/a"
++    photostreamXpath="/html/body/div[1]/div/div[3]/div/div/div/div[1]/ul/li[2]/a"
++    camerarollXpath="/html/body/div[1]/div/div[3]/div/div/div/div[1]/ul/li[8]/a/span"
++    uploadIconXpath="/html/body/div[1]/div/div[1]/div/div[3]/div/ul[2]/li[2]/a"
++    uploadButtonXpath="/html/body/div[2]/div[1]/div[2]/div/div/div[5]/div[1]/div/div[2]/div[2]/input"
++    editButtonXpath="/html/body/div[1]/div/div[2]/div/div[5]/div[1]/div/a"
++    deleteButtonXpath="/html/body/div[5]/div/div[2]/div/ul/li[4]/a"
++    deletePopUpXpath="/html/body/div[6]/div/div[4]/div/div[2]/button[2]"
++    editFormXpath="/html/body/div[4]/div[1]/div[2]/div/div/div[3]/div[2]/div[4]/div/ul/li[1]"
++    pictureNameUploadXpath="/html/body/div[4]/div[1]/div[2]/div/div/div[3]/div[2]/div[4]/div/ul/li[1]/form/div[1]/input"
++    uploadFormButtonXpath="/html/body/div[4]/div[1]/div[2]/div/div/div[4]/div[1]/div[1]/input"
++    uploadPopUpXpath="/html/body/div[14]/div/div/div/div[2]/div[2]/div[2]/input[1]"
++    firstPicXpath="/html/body/div[1]/div/div[4]/div[2]/div[2]/div[1]/div/div/a"
++    photosCountXpath="/html/body/div[1]/div/div[2]/div/div[4]/div[3]/div[2]/p[4]"
++
++    #change name
++    settingsButtonXpath="/html/body/div[5]/div/div[2]/div/div/div/section[3]/ul/li[2]/a"
++    changeRealNameXpath="/html/body/div[1]/div/div[4]/div/div[2]/div[2]/div[2]/div[1]/div/div[2]/p[1]/a"
++    changeDisplayNameXpath="/html/body/div[1]/div/div[4]/div/div[2]/div[2]/div[2]/div[1]/div/div[2]/p[2]/a"
++    firstNameInputXpath="/html/body/div[2]/form/table/tbody/tr/td/table[1]/tbody/tr[1]/td[2]/input"
++    lastNameInputXpath="/html/body/div[2]/form/table/tbody/tr/td/table[1]/tbody/tr[2]/td[2]/input"
++    saveRealNameXpath="/html/body/div[2]/form/table/tbody/tr/td/p[1]/input"
++    saveDisplayNameXpath="/html/body/div[2]/table/tbody/tr/td[2]/form/p[2]/input"
++    realNameXpath="/html/body/div[1]/div/div[2]/div/div[4]/div[3]/div[1]/h1"
++    errorMessageDisplayXpath="/html/body/div[2]/table/tbody/tr/td[2]/p"
++    displayNameXpath="/html/body/div[2]/table/tbody/tr/td[2]/form/p[1]/input"
++    handleNameXpath="/html/body/div[1]/div/div[2]/div/div[4]/div[3]/div[2]/p[1]"
++    editPasswordXpath="/html/body/div[1]/div/div[4]/div/div[2]/div[1]/div[2]/div[1]/div/div[2]/p[2]/a"
++    currentPasswordInputXpath="/html/body/div/div/div[2]/div/div[2]/form/div[1]/div/input"
++    newPasswordInputXpath="/html/body/div/div/div[2]/div/div[2]/form/div[2]/div[1]/div/input"
++    changePasswordButtonXpath="/html/body/div/div/div[2]/div/div[2]/form/button"
++    gotItButtonXpath="/html/body/div/div/div[2]/div/div[1]/div[2]/button"
++    noLeadingSpaceXpath="/html/body/div/div/div[2]/div/div[2]/form/div[2]/div[2]/div/div[2]/svg"
++
++
+diff --git a/unfollowcheck.py b/unfollowcheck.py
+new file mode 100644
+index 0000000..aac2b8f
+--- /dev/null
++++ b/unfollowcheck.py
+@@ -0,0 +1,97 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from locators import Locators
++
++
++import time
++
++
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++# def check_exists_by_xpath(xpath):
++#     try:
++#         webdriver.find_element_by_xpath(xpath)
++#     except NoSuchElementException:
++#         return False
++#     return True
++
++myEmail = "mariamaximus1012@gmail.com";
++myPassword = "1234567891011m";
++# myEmail = "passantahmedmaher@gmail.com";
++# myPassword = "1234567891011!!";
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++searchInput=driver.find_element_by_xpath(Locators.searchInputXpath);
++profile="myriammaximus"
++searchInput.send_keys(profile);
++time.sleep(2)
++searchPeople=driver.find_element_by_xpath(Locators.searchPeopleXpath);
++driver.execute_script("arguments[0].click();", searchPeople)
++
++#press unfollow button
++followButton = driver.find_element_by_xpath(Locators.followButtonXpath)
++driver.execute_script("arguments[0].click();", followButton)
++time.sleep(1);
++unfollowButton = driver.find_element_by_xpath(Locators.unfollowButtonXpath)
++driver.execute_script("arguments[0].click();", unfollowButton)
++time.sleep(3)
++followButton = driver.find_element_by_xpath(Locators.followButtonXpath)
++print(followButton.text)
++assert followButton.text == 'Follow';
++
++
++
++
++time.sleep(2);
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++ProfileNameButton.click();
++# myProfile=driver.find_element_by_xpath(Locators.myProfileXpath);
++
++followersButton=driver.find_element_by_xpath(Locators.followingButtonXpath);
++followersButton.click();
++
++
++searchFollowingInput=driver.find_element_by_xpath(Locators.searchFollowingInputXpath);
++searchFollowingInput.send_keys(profile)
++try:
++    searchProfile = driver.find_element_by_xpath(Locators.searchProfileXpath);
++    print("found,unfollow failed")
++    searchProfile.click();
++    time.sleep(3)
++    profileName=driver.find_element_by_xpath("/html/body/div[2]/table[2]/tbody/tr/td[2]/a").text
++    # print(profileName)
++    # print(profile)
++    if profile == profileName:
++        print("correct")
++    else:
++        print("uncorrect")
++
++except NoSuchElementException:
++    print("not found,sucessufly unfollowed")
++
++
++
++
+diff --git a/upload.py b/upload.py
+new file mode 100644
+index 0000000..ca1eb54
+--- /dev/null
++++ b/upload.py
+@@ -0,0 +1,108 @@
++from selenium import webdriver
++import unittest
++from selenium.webdriver.common.by import By
++from selenium.webdriver.support.ui import WebDriverWait
++from selenium.webdriver.support import expected_conditions as EC
++from selenium.webdriver import ActionChains
++from selenium.common.exceptions import NoSuchElementException
++from selenium.webdriver.common.keys import Keys
++from locators import Locators
++# import ait
++# import autoit
++import time
++
++
++driver=webdriver.Chrome(executable_path="C:\webdrivers\chromedriver.exe")
++driver.maximize_window();
++driver.get("https://identity.flickr.com/");
++print(driver.title);
++
++
++
++myEmail = "mariamaximus1012@gmail.com";
++myPassword = "1234567891011m";
++# myEmail = "passantahmedmaher@gmail.com";
++# myPassword = "1234567891011!!";
++emailAddressField = driver.find_element_by_id("login-email");
++nextButton = driver.find_element_by_xpath(Locators.nextButtonXpath);
++emailAddressField.send_keys(myEmail);
++nextButton.click();
++driver.implicitly_wait(60)
++passwordField = driver.find_element_by_id("login-password");
++passwordField.send_keys(myPassword);
++signInButton = driver.find_element_by_xpath(Locators.signInButtonXpath);
++signInButton.click();
++driver.implicitly_wait(60)
++pageTitle=driver.title;
++
++#go to my profile
++ProfileButton = driver.find_element_by_xpath(Locators.profileButtonXpath);
++ProfileButton.click();
++time.sleep(2);
++ProfileNameButton=driver.find_element_by_xpath(Locators.profileNameButtonXpath);
++ProfileNameButton.click();
++
++cameraroll=driver.find_element_by_xpath(Locators.camerarollXpath);
++cameraroll.click();
++time.sleep(1);
++
++photosCount=driver.find_element_by_xpath(Locators.photosCountXpath).text;
++b=photosCount.__contains__("Photos");
++if b== True:
++    p=photosCount.removesuffix(' Photos');
++else:
++    p = photosCount.removesuffix(' Photo');
++
++count=int(p, base=10);
++print(count);
++# time.sleep(1);
++# photostream=driver.find_element_by_xpath(Locators.photostreamXpath);
++# photostream.click();
++
++##upload icon working
++uploadIcon=driver.find_element_by_xpath(Locators.uploadIconXpath);
++uploadIcon.click();
++
++
++time.sleep(20)
++
++print("end of waiting")
++picName="dog2"
++
++editForm=driver.find_element_by_xpath(Locators.editFormXpath);
++editForm.click()
++pictureNameUpload=driver.find_element_by_xpath(Locators.pictureNameUploadXpath);
++pictureNameUpload.send_keys(picName);
++
++time.sleep(3);
++uploadFormButton=driver.find_element_by_xpath(Locators.uploadFormButtonXpath)
++uploadFormButton.click();
++
++uploadPopUp=driver.find_element_by_xpath(Locators.uploadPopUpXpath);
++uploadPopUp.click();
++time.sleep(5);
++
++check = driver.find_element_by_xpath(Locators.firstPicXpath).get_attribute("aria-label")
++assert (check).__contains__(picName), "Failed to upload"
++print(check);
++
++
++cameraroll=driver.find_element_by_xpath(Locators.camerarollXpath);
++cameraroll.click();
++time.sleep(2);
++##assertion on the count
++photosCount=driver.find_element_by_xpath(Locators.photosCountXpath).text;
++bAfter=photosCount.__contains__("Photos");
++if bAfter== True:
++    pAfter=photosCount.removesuffix(' Photos');
++else:
++    pAfter = photosCount.removesuffix(' Photo');
++pAfter=photosCount.removesuffix(' Photos');
++countAfter=int(pAfter, base=10);
++print(countAfter);
++count=count+1;
++print(countAfter);
++print(count);
++assert countAfter==count, "wrong count"
++
++
+
+commit cbc31be85a2828db9f823e4e35b459d8a39e9119
+Author: Passant Ahmed <45512625+passant23@users.noreply.github.com>
+Date:   Wed May 5 20:58:31 2021 +0200
+
+    Initial commit
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..24c120b
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1 @@
++# Flickr-Testing
+\ No newline at end of file

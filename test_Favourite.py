@@ -1,60 +1,71 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from msedge.selenium_tools import Edge, EdgeOptions
 import time
 from Locators import Locators
+import pytest
+import warnings
 
-# Change this according to your chosen browser
-options = EdgeOptions()
-options.use_chromium = True
+@pytest.fixture()
+def setup():
+    global driver
+    # Change this according to your chosen browser
+    options = EdgeOptions()
+    options.use_chromium = True
 
-driver = Edge(options = options)
-driver.implicitly_wait(10) # seconds
-driver.get("https://identity.flickr.com/")
+    driver = Edge(options = options)
+    driver.implicitly_wait(60) # seconds
+    driver.get("https://identity.flickr.com/")
+    #driver.maximize_window()
 
-LocatorS = Locators()
+    #Variables
+    email = "ossyahya60@gmail.com"
+    password = "32233750Yhaya"
 
-#Variables
-email = "ossyahya60@gmail.com"
-password = "32233750Yhaya"
+    #Locators
+    emailField = driver.find_element_by_id(Locators.email)
+    nextButton = driver.find_element_by_xpath(Locators.nextButton)
 
-#Locators
-Email = driver.find_element_by_id(LocatorS.Email)
-NextButton = driver.find_element_by_xpath(LocatorS.NextButton)
+    #Actions
+    emailField.send_keys(email)
+    nextButton.click()
 
-#Actions
-Email.send_keys(email)
-NextButton.click()
+    #Locators
+    passwordField = driver.find_element_by_id(Locators.password)
+    signIn = driver.find_element_by_xpath(Locators.signIn)
 
-#Locators
-Password = driver.find_element_by_id(LocatorS.Password)
-SignIN = driver.find_element_by_xpath(LocatorS.SignIN)
+    #Actions
+    passwordField.send_keys(password)
+    signIn.click()
+    time.sleep(10)
+    driver.get("https://www.flickr.com/photos/cmichel67/51186715430/in/dateposted/")
+    time.sleep(10)
 
-#Actions
-Password.send_keys(password)
-SignIN.click()
-time.sleep(5)
-driver.get("https://www.flickr.com/photos/116685283@N05/51140140914/in/dateposted/")
-time.sleep(10)
+    yield
 
-#Locators
-FavouriteButton = driver.find_element_by_xpath(LocatorS.FavouriteButton)
+    driver.close()
+    driver.quit()
 
-#Locators
-FavesCountPrev = int(driver.find_element_by_class_name(LocatorS.FavesCount).text)
+def test_FavouriteAlready(setup):
+    #Locators
+    try:
+        favouriteButton = driver.find_element_by_class_name("fave-star animated")
+    except:
+        warnings.warn(UserWarning("Image had been already favourited!"))
 
-#Actions
-FavouriteButton.click()
+def test_FavouriteImage(setup):
+    #Locators
+    favouriteButton = driver.find_element_by_xpath(Locators.favouriteButton)
 
-time.sleep(5)
+    #Locators
+    favesCountPrev = int(driver.find_element_by_class_name(Locators.favesCount).text)
 
-#Locators
-FavesCountCurrent = int(driver.find_element_by_class_name(LocatorS.FavesCount).text)
+    #Actions
+    favouriteButton.click()
 
-#Check If Button is really pressed
-assert FavesCountCurrent > FavesCountPrev
-assert FavouriteButton.get_attribute("class") == "fave-star animated is-faved"
+    time.sleep(5)
 
-time.sleep(5)
+    #Locators
+    favesCountCurrent = int(driver.find_element_by_class_name(Locators.favesCount).text)
 
-driver.quit()
+    #Check If Button is really pressed
+    assert favesCountCurrent > favesCountPrev
+    assert favouriteButton.get_attribute("class") == "fave-star animated is-faved"

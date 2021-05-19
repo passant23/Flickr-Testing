@@ -1,10 +1,9 @@
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common import keys
 from msedge.selenium_tools import Edge, EdgeOptions
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 import time
 from Locators import Locators
+import warnings
 import pytest
 
 @pytest.fixture()
@@ -22,8 +21,8 @@ def setup():
     #Variables
     email = "ossyahya60@gmail.com"
     password = "32233750Yhaya"
-    global newDescription
-    newDescription = "Very Noice"
+    global newTag
+    newTag = "nice"
 
     #Locators
     emailField = driver.find_element_by_id(Locators.email)
@@ -51,28 +50,40 @@ def setup():
 
 #CookieClose = driver.find_element_by_xpath('/html/body/div[1]/div/div[4]/div/div/div/div/div/div[2]/a').click()
 
-def test_EditDescription(setup):
+def test_IfDuplicate(setup):    
     #Locators
-    editDescriptionArea = driver.find_element_by_xpath(Locators.editDescriptionArea)
+    addTagsButton = driver.find_element_by_xpath(Locators.addTagsButton)
 
     #Actions
-    editDescriptionArea.send_keys(Keys.ENTER)
+    addTagsButton.click()
 
-    #Locators
-    editDescriptionTextField = driver.find_element_by_xpath(Locators.editDescriptionTextField)
+    #Locator
+    tagsList = driver.find_element_by_class_name(Locators.tagsList)
 
-    #Actions
-    editDescriptionTextField.clear()
-    editDescriptionTextField.send_keys(newDescription)
+    #Action
+    tags = tagsList.text.split('\n')
+    for tag in tags:
+        if tag == newTag:
+            warnings.warn(UserWarning("Duplicate Tag!"))
 
-    #Locator and Action
-    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, Locators.doneButton))).click()
 
-    driver.refresh()
+def test_TagRegistered(setup):
+    #Locator
+    addTagButton = driver.find_element_by_xpath(Locators.addTagsButton)
 
-    time.sleep(5)
+    #Action
+    addTagButton.click()
 
-    descriptionField = driver.find_element_by_xpath(Locators.descriptionField)
-    description = descriptionField.text
+    #Locator
+    tagTextField = driver.find_element_by_xpath(Locators.tagTextField)
 
-    assert description == newDescription
+    #Locator
+    tagsList = driver.find_element_by_class_name(Locators.tagsList)
+
+    #Action
+    tagTextField.send_keys(newTag)
+    tagTextField.send_keys(keys.Keys.ENTER)
+
+    time.sleep(2)
+
+    assert newTag in tagsList.text.split('\n'), "Failed to find the tag in the tags list!"
