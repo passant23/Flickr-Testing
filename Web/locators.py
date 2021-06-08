@@ -83,7 +83,10 @@ class Locators():
     emailId = "email"
     forgetPasswordButtonId = "forgotpassword-button"
 
-    # Search
+
+
+    #Search
+
     searchInputXpath = "/html/body/div/div/div/div/div/div/div/div/div[3]/div/ul[2]/li[1]/div/form/input"
     searchPeopleXpath = "/html/body/div/div/main/div/button[2]"
     profileNameXpath = "/html/body/div/div/main/div/div[1]/div/h2"
